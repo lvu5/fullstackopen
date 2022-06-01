@@ -1,24 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import axios from "axios";
+import React from 'react';
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas",
-      number: "040-1234567"  
-    },
-    {
-      name: "Linh",
-      number: "040-123098"
-    },
-    {
-      name: "Linh 1",
-      number: "0987654321"
-    }
-  ]);
+
+  const [persons, setPersons] = useState([]);
 
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("")
   const [filterValue, setFilterValue] = useState("")
   
+  useEffect(() => {
+    console.log("effect")
+    const promsise = axios.get("http://localhost:3001/persons")
+    promsise.then(response => {
+      console.log("promise fullfiled")
+      setPersons(response.data)
+    })
+  }, [])
+
   const addName = (event) => {
     event.preventDefault();
     const newNameObject = {
@@ -34,6 +34,9 @@ const App = () => {
       alert(`${newName} is already added to phonebook`)
 
   }
+
+
+
   const onInputChange = (event) => {
     console.log(event.target)
     setNewName(event.target.value)
