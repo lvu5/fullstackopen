@@ -13,8 +13,6 @@ function App() {
   }
   const countriesToShow = findCountry != "" ? countries.filter(c => 
     c.name.common.toLowerCase().includes(findCountry)) : []
-  
-  const oneCountry = countriesToShow.length == 1 ? countriesToShow : []
 
   useEffect(() => {
   const promise = axios.get('https://restcountries.com/v3.1/all')
@@ -30,13 +28,7 @@ function App() {
         find countries <input value={findCountry}
                               onChange={onFindChange}/>
       </div>
-      <div>
-        {countriesToShow.map(c => {
-          return(<div key = {c.cca2}>{c.name.common}</div>)
-        })}
-      </div>
       <CountriesInfo array = {countriesToShow}/>
-
     </div>
   );
 }
