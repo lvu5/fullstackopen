@@ -1,23 +1,31 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import React from 'react';
+import phoneService from "./services/phonebook.js"
 
 const App = () => {
-
+  const t1 = [1,2,3]
+  t1.push(4)
+  console.log(t1)
   const [persons, setPersons] = useState([]);
-
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("")
   const [filterValue, setFilterValue] = useState("")
   
   useEffect(() => {
     console.log("effect")
-    const promsise = axios.get("http://localhost:3001/persons")
-    promsise.then(response => {
+    phoneService.getAll().then(data =>{
       console.log("promise fullfiled")
-      setPersons(response.data)
+      setPersons(data)
     })
   }, [])
+  
+  const deleteName = (event) => {
+    event.preventDefault();
+    phoneService.deleteObject(event.target.getAttribute("realkey")).then(r => {
+      setPersons(persons.filter(item => item.id != event.target.getAttribute("realkey")))
+    })
+  }
 
   const addName = (event) => {
     event.preventDefault();
@@ -28,14 +36,31 @@ const App = () => {
     const arr = persons.map(p => p.name)
 
     if (!arr.includes(newName)){
-      setPersons(persons.concat(newNameObject))
+      // setPersons(persons.concat(newNameObject)) 
+      // without server
+      // with server, we are not triggering the state directly 
+      // but after posting it then we are doing it
+      // axios.post("http://localhost:3001/persons", newNameObject)
+      //   .then(r => {
+      //     setPersons(persons.concat(r))
+      //     setNewName("")
+      //     setNewNumber("")
+      //   })
+      phoneService.create(newNameObject).then(returnedNote => {
+        setPersons(persons.concat(returnedNote))
+        setNewName("")
+        setNewNumber("")
+      })
+      // phoneService.create(newNameObject).then(object => {
+      //   setPersons(persons.concat(object))
+      //   setNewName("")
+      //   setNewNumber("")
+      // })
     }
     else
       alert(`${newName} is already added to phonebook`)
 
   }
-
-
 
   const onInputChange = (event) => {
     console.log(event.target)
@@ -56,6 +81,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+
       <div>
         filter shown with <input value={filterValue}
                                  onChange={onFilterChange}
@@ -79,13 +105,23 @@ const App = () => {
         <div>
           <button type="submit">add</button>
         </div>
-      </form>
+      </form>      
+      <div>
+        
+      </div>
 
       <h2>Numbers</h2>
-          {namesToShow.map(p => 
-          <p key={p.name}>{p.name} {p.number}</p>)}
+          {namesToShow.map(p => {
+            return(
+              <div key={p.id}>
+                <p>{p.name} {p.number+" "} <button key={p.id} realkey={p.id} onClick={deleteName}>delete</button></p>
+              </div>
+              )
+            })
+          }
     </div>
   );
 };
 
 export default App;
+
