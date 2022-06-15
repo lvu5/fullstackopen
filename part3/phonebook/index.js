@@ -1,9 +1,11 @@
 const express = require('express')
+const cors = require('cors')
 const morgan = require('morgan')
 const app = express()
 
 app.use(express.json())
-app.use(morgan)
+app.use(morgan())
+app.use(cors())
 
 let phonebook = [
     { 
@@ -53,7 +55,7 @@ function getRandomInt(max) {
   return Math.floor(Math.random() * max);
 }
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response) => {e
     const body = request.body
     if (body.name === "" || body.number === "")
         return response.status(404).json({
